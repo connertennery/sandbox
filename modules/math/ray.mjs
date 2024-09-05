@@ -1,4 +1,4 @@
-import { Vec2 } from "/modules/math/vec.mjs";
+import { Vec2 } from "./vec.mjs";
 
 export class Ray {
 	/**

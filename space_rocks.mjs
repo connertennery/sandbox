@@ -4,11 +4,11 @@ import {
 	random_int,
 	random_float,
 	random_vec2,
-} from "/modules/math/random.mjs";
-import { Vec2 } from "/modules/math/vec.mjs";
-import { Rotation } from "/modules/math/rotation.mjs";
-import { Line } from "/modules/math/line.mjs";
-import { Ray } from "/modules/math/ray.mjs";
+} from "./modules/math/random.mjs";
+import { Vec2 } from "./modules/math/vec.mjs";
+import { Rotation } from "./modules/math/rotation.mjs";
+import { Line } from "./modules/math/line.mjs";
+import { Ray } from "./modules/math/ray.mjs";
 
 let __initialized = false;
 
