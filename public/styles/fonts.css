@@ -1,0 +1,116 @@
+/* #region JetBrains Mono Nerd Font */
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-Thin.woff2') format('woff2');
+	font-weight: 100;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-ThinItalic.woff2') format('woff2');
+	font-weight: 100;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-ExtraLight.woff2') format('woff2');
+	font-weight: 200;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-ExtraLightItalic.woff2') format('woff2');
+	font-weight: 200;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-Light.woff2') format('woff2');
+	font-weight: 300;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-LightItalic.woff2') format('woff2');
+	font-weight: 300;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-Regular.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-Italic.woff2') format('woff2');
+	font-weight: 400;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-Medium.woff2') format('woff2');
+	font-weight: 500;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-MediumItalic.woff2') format('woff2');
+	font-weight: 500;
+	font-style: italic;
+}
+
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-SemiBold.woff2') format('woff2');
+	font-weight: 600;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-SemiBoldItalic.woff2') format('woff2');
+	font-weight: 600;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-Bold.woff2') format('woff2');
+	font-weight: 700;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-BoldItalic.woff2') format('woff2');
+	font-weight: 700;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-ExtraBold.woff2') format('woff2');
+	font-weight: 800;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Nerd Font';
+	src: url('/public/fonts/jetbrains_mono/JetBrainsMonoNerdFontMono-ExtraBoldItalic.woff2') format('woff2');
+	font-weight: 800;
+	font-style: italic;
+}
+
+/* #endregion JetBrains Mono Nerd Font */
