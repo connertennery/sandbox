@@ -84,6 +84,18 @@ const keys = {
 	down: false,
 };
 
+const toggles = {
+	raycast: false,
+	ship_axis: false,
+	ship_velocity: false,
+	screen_help: false,
+};
+
+const debug_options = {
+	num_rays: 8,
+	scaling: window.devicePixelRatio,
+};
+
 //debugging line intersection
 const lines = {
 	a: new Line(
@@ -140,16 +152,31 @@ export async function load() {
 }
 
 function handle_canvas_resize() {
-	//super resolution
-	const dpr = window.devicePixelRatio * 2;
+	//#region super resolution
+	// const dpr = window.devicePixelRatio * 2;
+	// const rect = cnv.getBoundingClientRect();
+	//
+	// cnv.width = rect.width * dpr;
+	// cnv.height = rect.height * dpr;
+	// ctx.resetTransform();
+	// ctx.scale(dpr, dpr);
+	// cnv.style.width = `${rect.width}px`;
+	// cnv.style.height = `${rect.height}px`;
+	//
+	// canvasWidth = cnv.width / dpr;
+	// canvasHeight = cnv.height / dpr;
+	//#endregion super resolution
+
+	const dpr = debug_options.scaling;
 	const rect = cnv.getBoundingClientRect();
 
 	cnv.width = rect.width * dpr;
 	cnv.height = rect.height * dpr;
 	ctx.resetTransform();
 	ctx.scale(dpr, dpr);
-	cnv.style.width = `${rect.width}px`;
-	cnv.style.height = `${rect.height}px`;
+	//-2 to remove the border, otherwise the canvas will grow each time this runs
+	cnv.style.width = `${rect.width - 2}px`;
+	cnv.style.height = `${rect.height - 2}px`;
 
 	canvasWidth = cnv.width / dpr;
 	canvasHeight = cnv.height / dpr;
@@ -161,6 +188,8 @@ function handle_canvas_resize() {
 function handle_pointer_move(event) {
 	pointer.pos.set(event.offsetX, event.offsetY);
 }
+
+//TODO.MEDIUM: These key handlers should be switches.
 
 /**
  * @param {KeyboardEvent} event
@@ -186,20 +215,37 @@ function handle_keydown(event) {
 function handle_keyup(event) {
 	if (event.key === "ArrowLeft" || event.key.toUpperCase() === "A") {
 		keys.left = false;
-	}
-	if (event.key === "ArrowRight" || event.key.toUpperCase() === "D") {
+	} else if (event.key === "ArrowRight" || event.key.toUpperCase() === "D") {
 		keys.right = false;
-	}
-	if (event.key === "ArrowUp" || event.key.toUpperCase() === "W") {
+	} else if (event.key === "ArrowUp" || event.key.toUpperCase() === "W") {
 		keys.up = false;
-	}
-	if (event.key === "ArrowDown" || event.key.toUpperCase() === "S") {
+	} else if (event.key === "ArrowDown" || event.key.toUpperCase() === "S") {
 		keys.down = false;
+	} else if (event.key.toUpperCase() === "F") {
+		toggle_fullscreen();
+	} else if (event.key === "1") {
+		toggles.ship_axis = !toggles.ship_axis;
+	} else if (event.key === "2") {
+		toggles.ship_velocity = !toggles.ship_velocity;
+	} else if (event.key === "3") {
+		toggles.raycast = !toggles.raycast;
+	} else if (event.key === "8") {
+		debug_options.scaling = Math.max(0.25, debug_options.scaling - 0.25);
+		handle_canvas_resize();
+	} else if (event.key === "9") {
+		debug_options.scaling = Math.min(20, debug_options.scaling + 0.25);
+		handle_canvas_resize();
+	} else if (event.key === "-") {
+		debug_options.num_rays = Math.max(1, debug_options.num_rays / 2);
+	} else if (event.key === "=") {
+		debug_options.num_rays = Math.min(1024, debug_options.num_rays * 2);
+	} else if (event.key === "?") {
+		toggles.screen_help = true;
+	} else if (event.key === "q") {
+		toggles.screen_help = false;
 	}
 
-	if (event.key.toUpperCase() === "F") {
-		toggle_fullscreen();
-	}
+	requestAnimationFrame(update);
 }
 
 /**
@@ -219,6 +265,7 @@ function toggle_fullscreen() {
 
 function update_debug() {
 	debug_info.push(`pointer.pos: ${pointer.pos}`);
+	debug_info.push(`num_rays: ${debug_options.num_rays}`);
 	debug.innerText = debug_info.join(`\n`);
 	debug_info = [];
 }
@@ -262,10 +309,17 @@ function create_rock() {
 	return rock;
 }
 
+let frame_time = 16;
 function update() {
 	const start = performance.now();
-	// ctx.fillStyle = "#000000";
+	const primary = "#eef";
+	const secondary = "#aaeeff";
+	const accent = "#f0ff31";
+	const background = "#222240";
+	ctx.fillStyle = background;
+
 	ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
 	// ctxImageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
 	update_physics();
 
@@ -286,23 +340,156 @@ function update() {
 	render_debug();
 
 	const end = performance.now();
-	debug_info.unshift(`frame_time: ${(end - start).toFixed(2)}ms`);
-	debug_info.unshift(`fps: ${(1000 / (end - start)).toFixed(2)}`);
+	frame_time = end - start;
+	debug_info.unshift(`frame_time: ${frame_time.toFixed(2)}ms`);
+	debug_info.unshift(`fps: ${(1000 / frame_time).toFixed(2)}`);
 	update_debug();
+	if (toggles.screen_help) {
+		render_screen_help();
+	}
 	requestAnimationFrame(update);
+}
+
+function render_screen_help() {
+	ctx.save();
+	const primary = "#eef";
+	const secondary = "#aaeeff";
+	const accent = "#f0ff31";
+	const background = "#222240";
+
+	ctx.beginPath();
+	ctx.globalAlpha = 0.8;
+	ctx.fillStyle = background;
+	ctx.fillRect(
+		canvasWidth * 0.2,
+		canvasHeight * 0.2,
+		canvasWidth * 0.6,
+		canvasHeight * 0.6,
+	);
+	ctx.closePath();
+	ctx.fill();
+
+	ctx.beginPath();
+	ctx.globalAlpha = 1.0;
+	ctx.strokeStyle = accent;
+
+	ctx.rect(
+		canvasWidth * 0.2,
+		canvasHeight * 0.2,
+		canvasWidth * 0.6,
+		canvasHeight * 0.6,
+	);
+	ctx.closePath();
+	ctx.stroke();
+
+	ctx.beginPath();
+	ctx.fillStyle = accent;
+	ctx.font = "20pt monospace";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText("controls", canvasWidth * 0.5, canvasHeight * 0.25);
+	ctx.closePath();
+	ctx.fill();
+
+	const controls = [
+		{
+			key: "?",
+			description: "show this help screen",
+		},
+		{
+			key: "q",
+			description: "close this help screen",
+		},
+		{
+			key: "w | up arrow",
+			description: "move ship forward",
+		},
+		{
+			key: "a | left arrow",
+			description: "turn ship left",
+		},
+		{
+			key: "d | right arrow",
+			description: "turn ship right",
+		},
+		{
+			key: "s | down arrow",
+			description: "brake ship",
+		},
+		{
+			key: "1",
+			description: "[debug] show ship axis",
+		},
+		{
+			key: "2",
+			description: "[debug] show ship velocity",
+		},
+		{
+			key: "3",
+			description: "[debug] show raycasting",
+		},
+		{
+			key: "8",
+			description: `[debug] decrease scaling (${debug_options.scaling})`,
+		},
+		{
+			key: "9",
+			description: `[debug] increase scaling (${debug_options.scaling})`,
+		},
+		{
+			key: "-",
+			description: `[debug] decrease number of rays (${debug_options.num_rays})`,
+		},
+		{
+			key: "=",
+			description: `[debug] increase number of rays (${debug_options.num_rays})`,
+		},
+	];
+
+	ctx.beginPath();
+	ctx.font = "bold 14pt monospace";
+	ctx.textAlign = "right";
+	ctx.fillStyle = secondary;
+	for (let i = 0; i < controls.length; i++) {
+		const control = controls[i];
+		ctx.fillText(control.key, canvasWidth * 0.36, canvasHeight * 0.3 + i * 20);
+	}
+	ctx.closePath();
+	ctx.fill();
+
+	ctx.beginPath();
+	ctx.font = "14pt monospace";
+	ctx.textAlign = "left";
+	ctx.fillStyle = primary;
+	for (let i = 0; i < controls.length; i++) {
+		const control = controls[i];
+		ctx.fillText(
+			control.description,
+			canvasWidth * 0.42,
+			canvasHeight * 0.3 + i * 20,
+		);
+	}
+	ctx.closePath();
+	ctx.fill();
+
+	ctx.restore();
 }
 
 function check_collisions() {
 	ctx.save();
+	ctx.beginPath();
 	ctx.fillStyle = "#fa0";
 	for (const sline of ship_lines) {
 		for (const rline of rock_lines) {
 			const point = sline.intersect(rline);
 			if (point) {
 				ctx.ellipse(point.x, point.y, 14, 14, 0, 0, Math.PI * 2, false);
+				//if we hit once we don't need to check anymore
+				break;
 			}
 		}
 	}
+	ctx.closePath();
 	ctx.fill();
 	ctx.restore();
 }
@@ -312,18 +499,18 @@ function update_physics() {
 	if (keys.left) {
 		ship.angle_delta = Math.min(
 			ship.angle_delta_max,
-			ship.angle_delta + ship.angle_delta_force,
+			ship.angle_delta + ship.angle_delta_force * frame_time,
 		);
 	}
 	if (keys.right) {
 		ship.angle_delta = Math.max(
 			-ship.angle_delta_max,
-			ship.angle_delta - ship.angle_delta_force,
+			ship.angle_delta - ship.angle_delta_force * frame_time,
 		);
 	}
 	if (keys.up) {
 		const fr = new Vec2(Math.sin(ship.angle) * 0.1, Math.cos(ship.angle) * 0.1);
-		ship.vel = ship.vel.add(fr);
+		ship.vel = ship.vel.add(fr.mul(new Vec2(frame_time, frame_time)));
 	}
 
 	//auto-brake
@@ -375,7 +562,7 @@ function update_physics() {
 	for (let i = 0; i < rocks.length; i++) {
 		const rock = rocks[i];
 
-		rock.pos = rock.pos.add(rock.vel);
+		rock.pos = rock.pos.add(rock.vel.mul(new Vec2(frame_time, frame_time)));
 
 		const length = rock.size.length() * 1.5;
 		if (rock.pos.x + length < 0) {
@@ -390,11 +577,11 @@ function update_physics() {
 			rock.pos.y = 0 - length;
 		}
 
-		rock.angle += rock.angle_delta;
+		rock.angle += rock.angle_delta * frame_time;
 	}
 
-	ship.pos = ship.pos.add(ship.vel);
-	ship.angle += ship.angle_delta;
+	ship.pos = ship.pos.add(ship.vel.mul(new Vec2(frame_time, frame_time)));
+	ship.angle += ship.angle_delta * frame_time;
 
 	if (ship.pos.x + 20 < 0) {
 		ship.pos.x = canvasWidth + 20;
@@ -582,28 +769,13 @@ function render_ship() {
 	);
 	//#endregion points
 
+	ctx.save();
 	ctx.strokeStyle = "#44FFFF";
 	ctx.beginPath();
-	// forward point
-	// ctx.moveTo(ship.pos.x + forward.x * 8, ship.pos.y + forward.y * 8);
 	ctx.moveTo(point_forward.x, point_forward.y);
-	//back left
-	// ctx.lineTo(
-	// 	ship.pos.x + forward.x * -4 + left.x * 5,
-	// 	ship.pos.y + forward.y * -4 + left.y * 5,
-	// );
 	ctx.lineTo(point_back_left.x, point_back_left.y);
-	//back center
-	// ctx.lineTo(ship.pos.x + forward.x * -1, ship.pos.y + forward.y * -1);
 	ctx.lineTo(point_back_center.x, point_back_center.y);
-	//back right
-	// ctx.lineTo(
-	// 	ship.pos.x + forward.x * -4 + left.x * -5,
-	// 	ship.pos.y + forward.y * -4 + left.y * -5,
-	// );
 	ctx.lineTo(point_back_right.x, point_back_right.y);
-	//forward point
-	// ctx.lineTo(ship.pos.x + forward.x * 8, ship.pos.y + forward.y * 8);
 	ctx.lineTo(point_forward.x, point_forward.y);
 	ctx.closePath();
 	ctx.stroke();
@@ -625,11 +797,11 @@ function render_ship() {
 		for (let i = -4; i < 4; i++) {
 			ctx.lineTo(
 				ship.pos.x +
-				forward.x * (-8 * (0.9 + Math.sin(Math.random()))) +
-				left.x * i,
+					forward.x * (-8 * (0.9 + Math.sin(Math.random()))) +
+					left.x * i,
 				ship.pos.y +
-				forward.y * (-8 * (0.9 + Math.sin(Math.random()))) +
-				left.y * i,
+					forward.y * (-8 * (0.9 + Math.sin(Math.random()))) +
+					left.y * i,
 			);
 		}
 		ctx.closePath();
@@ -637,6 +809,7 @@ function render_ship() {
 	}
 
 	//#endregion thruster
+	ctx.restore();
 
 	debug_info.push(`ship.pos: ${ship.pos}`);
 	debug_info.push(`ship.vel: ${ship.vel}`);
@@ -816,7 +989,7 @@ function render_ship_rays() {
 	ctx.strokeStyle = "#afa";
 	ctx.lineWidth = 0.2;
 
-	const number_rays = 120;
+	const number_rays = debug_options.num_rays;
 	const total_rays = Math.PI * 2;
 	const ray_step = total_rays / number_rays;
 
@@ -828,9 +1001,7 @@ function render_ship_rays() {
 		const ray = new Ray(ship.pos, dir);
 		const point = ray.cast(rock_lines);
 		if (point) {
-			if (ii % 4 === 0) {
-				render_line(ship.pos, point);
-			}
+			render_line(ship.pos, point);
 			ctx.beginPath();
 			ctx.ellipse(point.x, point.y, 3, 3, 0, 0, Math.PI * 2, false);
 			ctx.closePath();
@@ -844,9 +1015,15 @@ function render_ship_rays() {
 }
 
 function render_debug() {
-	// render_ship_rays();
-	render_ship_axis();
-	// render_ship_velocity();
+	if (toggles.ship_axis) {
+		render_ship_axis();
+	}
+	if (toggles.ship_velocity) {
+		render_ship_velocity();
+	}
+	if (toggles.raycast) {
+		render_ship_rays();
+	}
 	// render_line_intersect();
 	// render_pointer();
 
@@ -892,3 +1069,5 @@ function render_debug() {
 	ctx.lineTo(ship.pos.x + x2 * 80, ship.pos.y + y2 * 80);
 	ctx.stroke();
 }
+
+load();
