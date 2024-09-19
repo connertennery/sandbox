@@ -195,17 +195,27 @@ function handle_pointer_move(event) {
  * @param {KeyboardEvent} event
  */
 function handle_keydown(event) {
-	if (event.key === "ArrowLeft" || event.key.toUpperCase() === "A") {
-		keys.left = true;
-	}
-	if (event.key === "ArrowRight" || event.key.toUpperCase() === "D") {
-		keys.right = true;
-	}
-	if (event.key === "ArrowUp" || event.key.toUpperCase() === "W") {
-		keys.up = true;
-	}
-	if (event.key === "ArrowDown" || event.key.toUpperCase() === "S") {
-		keys.down = true;
+	const key = event.key.toLowerCase();
+
+	switch (key) {
+		case "arrowleft":
+		case "a":
+			keys.left = true;
+			break;
+		case "arrowright":
+		case "d":
+			keys.right = true;
+			break;
+		case "arrowup":
+		case "w":
+			keys.up = true;
+			break;
+		case "arrowdown":
+		case "s":
+			keys.down = true;
+			break;
+		default:
+			break;
 	}
 }
 
@@ -213,36 +223,59 @@ function handle_keydown(event) {
  * @param {KeyboardEvent} event
  */
 function handle_keyup(event) {
-	if (event.key === "ArrowLeft" || event.key.toUpperCase() === "A") {
-		keys.left = false;
-	} else if (event.key === "ArrowRight" || event.key.toUpperCase() === "D") {
-		keys.right = false;
-	} else if (event.key === "ArrowUp" || event.key.toUpperCase() === "W") {
-		keys.up = false;
-	} else if (event.key === "ArrowDown" || event.key.toUpperCase() === "S") {
-		keys.down = false;
-	} else if (event.key.toUpperCase() === "F") {
-		toggle_fullscreen();
-	} else if (event.key === "1") {
-		toggles.ship_axis = !toggles.ship_axis;
-	} else if (event.key === "2") {
-		toggles.ship_velocity = !toggles.ship_velocity;
-	} else if (event.key === "3") {
-		toggles.raycast = !toggles.raycast;
-	} else if (event.key === "8") {
-		debug_options.scaling = Math.max(0.25, debug_options.scaling - 0.25);
-		handle_canvas_resize();
-	} else if (event.key === "9") {
-		debug_options.scaling = Math.min(20, debug_options.scaling + 0.25);
-		handle_canvas_resize();
-	} else if (event.key === "-") {
-		debug_options.num_rays = Math.max(1, debug_options.num_rays / 2);
-	} else if (event.key === "=") {
-		debug_options.num_rays = Math.min(1024, debug_options.num_rays * 2);
-	} else if (event.key === "?") {
-		toggles.screen_help = true;
-	} else if (event.key === "q") {
-		toggles.screen_help = false;
+	const key = event.key.toLowerCase();
+
+	switch (key) {
+		case "arrowleft":
+		case "a":
+			keys.left = false;
+			break;
+		case "arrowright":
+		case "d":
+			keys.right = false;
+			break;
+		case "arrowup":
+		case "w":
+			keys.up = false;
+			break;
+		case "arrowdown":
+		case "s":
+			keys.down = false;
+			break;
+		case "f":
+			toggle_fullscreen();
+			break;
+		case "1":
+			toggles.ship_axis = !toggles.ship_axis;
+			break;
+		case "2":
+			toggles.ship_velocity = !toggles.ship_velocity;
+			break;
+		case "3":
+			toggles.raycast = !toggles.raycast;
+			break;
+		case "8":
+			debug_options.scaling = Math.max(0.25, debug_options.scaling - 0.25);
+			handle_canvas_resize();
+			break;
+		case "9":
+			debug_options.scaling = Math.min(20, debug_options.scaling + 0.25);
+			handle_canvas_resize();
+			break;
+		case "-":
+			debug_options.num_rays = Math.max(1, debug_options.num_rays / 2);
+			break;
+		case "=":
+			debug_options.num_rays = Math.min(1024, debug_options.num_rays * 2);
+			break;
+		case "?":
+			toggles.screen_help = true;
+			break;
+		case "q":
+			toggles.screen_help = false;
+			break;
+		default:
+			break;
 	}
 
 	requestAnimationFrame(update);
@@ -347,7 +380,13 @@ function update() {
 	if (toggles.screen_help) {
 		render_screen_help();
 	}
-	requestAnimationFrame(update);
+	if (frame_time < 16) {
+		setTimeout(() => {
+			requestAnimationFrame(update);
+		}, 16 - frame_time);
+	} else {
+		requestAnimationFrame(update);
+	}
 }
 
 function render_screen_help() {
@@ -499,18 +538,18 @@ function update_physics() {
 	if (keys.left) {
 		ship.angle_delta = Math.min(
 			ship.angle_delta_max,
-			ship.angle_delta + ship.angle_delta_force * frame_time,
+			ship.angle_delta + ship.angle_delta_force, // * frame_time,
 		);
 	}
 	if (keys.right) {
 		ship.angle_delta = Math.max(
 			-ship.angle_delta_max,
-			ship.angle_delta - ship.angle_delta_force * frame_time,
+			ship.angle_delta - ship.angle_delta_force, // * frame_time,
 		);
 	}
 	if (keys.up) {
 		const fr = new Vec2(Math.sin(ship.angle) * 0.1, Math.cos(ship.angle) * 0.1);
-		ship.vel = ship.vel.add(fr.mul(new Vec2(frame_time, frame_time)));
+		ship.vel = ship.vel.add(fr); //.mul(new Vec2(frame_time, frame_time)));
 	}
 
 	//auto-brake
@@ -562,7 +601,7 @@ function update_physics() {
 	for (let i = 0; i < rocks.length; i++) {
 		const rock = rocks[i];
 
-		rock.pos = rock.pos.add(rock.vel.mul(new Vec2(frame_time, frame_time)));
+		rock.pos = rock.pos.add(rock.vel); //.mul(new Vec2(frame_time, frame_time)));
 
 		const length = rock.size.length() * 1.5;
 		if (rock.pos.x + length < 0) {
@@ -577,11 +616,11 @@ function update_physics() {
 			rock.pos.y = 0 - length;
 		}
 
-		rock.angle += rock.angle_delta * frame_time;
+		rock.angle += rock.angle_delta; // * frame_time;
 	}
 
-	ship.pos = ship.pos.add(ship.vel.mul(new Vec2(frame_time, frame_time)));
-	ship.angle += ship.angle_delta * frame_time;
+	ship.pos = ship.pos.add(ship.vel); //.mul(new Vec2(frame_time, frame_time)));
+	ship.angle += ship.angle_delta; // * frame_time;
 
 	if (ship.pos.x + 20 < 0) {
 		ship.pos.x = canvasWidth + 20;

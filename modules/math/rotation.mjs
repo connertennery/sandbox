@@ -14,7 +14,7 @@ export class Rotation {
 	}
 
 	euler() {
-		return (this.radians / (Math.PI * 2)) * 360;
+		return this.radians * (180 / Math.PI);
 	}
 
 	forward() {

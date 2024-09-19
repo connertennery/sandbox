@@ -30,7 +30,6 @@ export class Line {
 	length() {
 		//untested lol
 		return this.end.sub(this.start).length();
-		return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
 	}
 
 	/** Returns the intersection of this Line with the given line

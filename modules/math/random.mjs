@@ -18,7 +18,7 @@ export function random_vec2(min_x, min_y, max_x, max_y) {
 	let bx = max_x;
 	let by = max_y;
 
-	//no max_x (probably no max_y lol), so min_x is min for everything and min_y is max for everything
+	//no max_x (probably no max_y), so min_x is min for everything and min_y is max for everything
 	if (max_x === undefined) {
 		ax = min_x;
 		ay = min_x;
